@@ -13,9 +13,9 @@
  */
 
 /**
- * Enum for tri-state values.
+ * Cell state
  * @readonly
- * @enum {number}
+ * @enum {boolean}
  */
 var CELL_STATE = {
   POPULATED: true,
@@ -27,7 +27,7 @@ var CELL_STATE = {
  * @param {World} world 
  * @param {number} x X-axis coordinate
  * @param {number} y Y-axis coordinate 
- * @returns {boolean} If the cell is populated or not
+ * @returns {CELL_STATE} If the cell is populated or not
  */
 const getCell = (world, x, y) => {
   return world.get(`{${x},${y}}`) || false
@@ -67,10 +67,23 @@ const getCellNeighbours = (cell) => {
   return neighbours
 }
 
+/**
+ * Count the number of populated cells
+ * @param {Cell[]} cells List of cells 
+ * @returns {number} Number of populated cells
+ */
+const countPopulatedCells = (cells) => cells.reduce((acc, { x, y }) => acc + (getCell(world, x, y) ? 1 : 0), 0)
+
+/**
+ * Return the cell state in the following generation
+ * @param {World} world 
+ * @param {Cell} cell
+ * @returns {CELL_STATE} Cell state in the following generation
+ */
 const computeNextCellState = (world, cell) => {
   const isPopulated = getCell(world, cell.x, cell.y)
   const neighbours = getCellNeighbours(cell)
-  const numPopulatedNeighbours = neighbours.reduce((acc, { x, y }) => acc + (getCell(world, x, y) ? 1 : 0), 0)
+  const numPopulatedNeighbours = countPopulatedCells(neighbours)
   if (isPopulated) {
     if (numPopulatedNeighbours < 2) { return CELL_STATE.NOT_POPULATED }
     if (numPopulatedNeighbours <= 3) { return CELL_STATE.POPULATED }
@@ -83,6 +96,7 @@ const computeNextCellState = (world, cell) => {
 
 module.exports = {
   buildWorld,
+  countPopulatedCells,
   getCell,
   getCellNeighbours,
   computeNextCellState
