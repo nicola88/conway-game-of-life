@@ -1,6 +1,6 @@
 'use strict'
 
-const { buildWorld, getCell, updateWorld, getNeighbours, computeCellStatus } = require('./index')
+const { buildWorld, getCell, getCellNeighbours, computeNextCellState } = require('./index')
 
 describe("Game of Life", () => {
   it("should build the world from a input", () => {
@@ -27,7 +27,7 @@ describe("Game of Life", () => {
 
   it('should return the correct neighbours', () => {
     const cell = {x: 1, y: 1}
-    const neighbours = getNeighbours(cell)
+    const neighbours = getCellNeighbours(cell)
     expect(neighbours[0]).toEqual({x: -1, y: 2})
     expect(neighbours[1]).toEqual({x: 1, y: 2})
     expect(neighbours[2]).toEqual({x: 2, y: 2})
@@ -47,7 +47,7 @@ describe("Game of Life", () => {
       {x: 2, y: 3}
     ]
     const world = buildWorld(populatedCells)
-    expect(computeCellStatus(world, populatedCells[0])).toBeFalsy()
+    expect(computeNextCellState(world, populatedCells[0])).toBeFalsy()
   })
 
   // it("change generation", () => {
