@@ -1,12 +1,16 @@
 {
   "name": "game-of-life",
   "version": "1.0.0",
-  "description": "Conwaw's Game of Life",
+  "description": "Conway's Game of Life",
+  "keywords": ["kata", "game of life"],
   "main": "index.js",
   "scripts": {
     "test": "jest"
   },
-  "author": "",
+  "contributors": [
+    "Miriam Ancora",
+    "Nicola Moretto"
+  ],
   "license": "ISC",
   "dependencies": {
     "jest": "^29.1.2"
