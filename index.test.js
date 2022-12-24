@@ -1,28 +1,40 @@
 'use strict'
 
-const { buildWorld, getCell, getCellNeighbours, computeNextCellState } = require('./index')
+const { buildWorld, getCell, getCellNeighbours, computeCellNextState, countPopulatedCells, getNextState, CELL_STATE, getNextGeneration } = require('./index')
 
 describe("Game of Life", () => {
-  it("should build the world from a input", () => {
-      const populatedCells = [
-        {x: 1, y: 1},
-        {x: 2, y: 1},
-        {x: 3, y: 1},
-        {x: 3, y: 2},
-        {x: 2, y: 3}
-      ]
-      const world = buildWorld(populatedCells)
-      expect(getCell(world, 1, 1)).toBeTruthy()
-      expect(getCell(world, 2, 1)).toBeTruthy()
-      expect(getCell(world, 3, 1)).toBeTruthy()
-      expect(getCell(world, 3, 2)).toBeTruthy()
-      expect(getCell(world, 2, 3)).toBeTruthy()
-      expect(getCell(world, 1, 2)).toBeFalsy()
-      expect(getCell(world, 2, 2)).toBeFalsy()
-      expect(getCell(world, 1, 3)).toBeFalsy()
-      expect(getCell(world, 3, 3)).toBeFalsy()
-      expect(getCell(world, 25, 67)).toBeFalsy()
-      expect(getCell(world, 40, 83)).toBeFalsy()
+  const populatedCells = [
+    {x: 1, y: 1},
+    {x: 2, y: 1},
+    {x: 2, y: 3},
+    {x: 3, y: 1},
+    {x: 3, y: 2},
+  ]
+  const unpopulatedCells = [
+    {x: 1, y: 2},
+    {x: 1, y: 3},
+    {x: 2, y: 2},
+    {x: 3, y: 3},
+  ]
+  const world = buildWorld(populatedCells)
+
+  test.each([
+    [{x: 1, y: 1}, CELL_STATE.POPULATED],
+    [{x: 1, y: 2}, CELL_STATE.NOT_POPULATED],
+    [{x: 1, y: 3}, CELL_STATE.NOT_POPULATED],
+    [{x: 2, y: 1}, CELL_STATE.POPULATED],
+    [{x: 2, y: 2}, CELL_STATE.NOT_POPULATED],
+    [{x: 2, y: 3}, CELL_STATE.POPULATED],
+    [{x: 3, y: 1}, CELL_STATE.POPULATED],
+    [{x: 3, y: 2}, CELL_STATE.POPULATED],
+    [{x: 3, y: 3}, CELL_STATE.NOT_POPULATED],
+  ])('should get the correct state of cell %s', (cell, isPopulated) => {
+    expect(getCell(world, cell)).toStrictEqual(isPopulated)
+  })
+
+  it("should get the correct state of a cell far far away", () => {
+      expect(getCell(world, {x: 25, y: 67})).toBeFalsy()
+      expect(getCell(world, {x: 40, y: 83})).toBeFalsy()
   })
 
   it('should return the correct neighbours', () => {
@@ -38,35 +50,62 @@ describe("Game of Life", () => {
     expect(neighbours[7]).toEqual({x: -1, y: 1})
   })
 
-  it('should compute the cell status', () => {
-    const populatedCells = [
-      {x: 1, y: 1},
-      {x: 2, y: 1},
-      {x: 3, y: 1},
-      {x: 3, y: 2},
-      {x: 2, y: 3}
-    ]
-    const world = buildWorld(populatedCells)
-    expect(computeNextCellState(world, populatedCells[0])).toBeFalsy()
+  it('should count the populated cells', () => {
+    expect(countPopulatedCells(world, [])).toEqual(0)
+    expect(countPopulatedCells(world, unpopulatedCells)).toEqual(0)
+    expect(countPopulatedCells(world, populatedCells)).toEqual(populatedCells.length)
+    expect(countPopulatedCells(world, [...populatedCells, ...unpopulatedCells])).toEqual(populatedCells.length)
   })
 
-  // it("change generation", () => {
-  //   const populatedCells = [
-  //       {x: 1, y: 1},
-  //       {x: 2, y: 1},
-  //       {x: 3, y: 1},
-  //       {x: 3, y: 2},
-  //       {x: 2, y: 3}
-  //   ]
-  //   const world = buildWorld(populatedCells)
-  //   const newWorld = updateWorld(world)
-  //   expect(getCell(newWorld, 1,2).toBeTruthy())
-  //   expect(getCell(newWorld, 2,-1).toBeTruthy())
-  //   expect(getCell(newWorld, 2,1).toBeTruthy())
-  //   expect(getCell(newWorld, 3,1).toBeTruthy())
-  //   expect(getCell(newWorld, 3,2).toBeTruthy())
-  //   expect(newWorld.size).toEqual(5)
+  test.each([
+    [CELL_STATE.POPULATED, 0, CELL_STATE.NOT_POPULATED],
+    [CELL_STATE.POPULATED, 1, CELL_STATE.NOT_POPULATED],
+    [CELL_STATE.POPULATED, 2, CELL_STATE.POPULATED],
+    [CELL_STATE.POPULATED, 3, CELL_STATE.POPULATED],
+    [CELL_STATE.POPULATED, 4, CELL_STATE.NOT_POPULATED],
+    [CELL_STATE.NOT_POPULATED, 0, CELL_STATE.NOT_POPULATED],
+    [CELL_STATE.NOT_POPULATED, 1, CELL_STATE.NOT_POPULATED],
+    [CELL_STATE.NOT_POPULATED, 2, CELL_STATE.NOT_POPULATED],
+    [CELL_STATE.NOT_POPULATED, 3, CELL_STATE.POPULATED],
+    [CELL_STATE.NOT_POPULATED, 4, CELL_STATE.NOT_POPULATED],
+  ])('should compute the next state -- getNextState(%s, %s)', (isPopulated, numPopulatedNeighbours, willBePopulated) => {
+    expect(getNextState(isPopulated, numPopulatedNeighbours)).toStrictEqual(willBePopulated)
+  })
 
+  test.each([
+    [{x: 1, y: -1}, CELL_STATE.NOT_POPULATED],
+    [{x: 1, y: 1}, CELL_STATE.NOT_POPULATED],
+    [{x: 1, y: 2}, CELL_STATE.POPULATED],
+    [{x: 1, y: 3}, CELL_STATE.NOT_POPULATED],
+    [{x: 2, y: -1}, CELL_STATE.POPULATED],
+    [{x: 2, y: 1}, CELL_STATE.POPULATED],
+    [{x: 2, y: 2}, CELL_STATE.NOT_POPULATED],
+    [{x: 2, y: 3}, CELL_STATE.NOT_POPULATED],
+    [{x: 3, y: -1}, CELL_STATE.NOT_POPULATED],
+    [{x: 3, y: 1}, CELL_STATE.POPULATED],
+    [{x: 3, y: 2}, CELL_STATE.POPULATED],
+    [{x: 3, y: 3}, CELL_STATE.NOT_POPULATED],
+  ])('should compute the next state of the cell -- computeCellNextState(world, %s)', (cell, nextState) => {
+    expect(computeCellNextState(world, cell)).toStrictEqual(nextState)
+  })
 
-  // })
+  it("compute next generation of the world", () => {
+    const nextWorld = getNextGeneration(world)
+    expect(nextWorld.size).toEqual(5)
+
+    expect(getCell(nextWorld, {x: 1, y: -1})).toBeFalsy()
+    expect(getCell(nextWorld, {x: 1, y: 1})).toBeFalsy()
+    expect(getCell(nextWorld, {x: 1, y: 2})).toBeTruthy()
+    expect(getCell(nextWorld, {x: 1, y: 3})).toBeFalsy()
+
+    expect(getCell(nextWorld, {x: 2, y: -1})).toBeTruthy()
+    expect(getCell(nextWorld, {x: 2, y: 1})).toBeTruthy()
+    expect(getCell(nextWorld, {x: 2, y: 2})).toBeFalsy()
+    expect(getCell(nextWorld, {x: 2, y: 3})).toBeFalsy()
+
+    expect(getCell(nextWorld, {x: 3, y: -1})).toBeFalsy()
+    expect(getCell(nextWorld, {x: 3, y: 1})).toBeTruthy()
+    expect(getCell(nextWorld, {x: 3, y: 2})).toBeTruthy()
+    expect(getCell(nextWorld, {x: 3, y: 3})).toBeFalsy()
+  })
 })
