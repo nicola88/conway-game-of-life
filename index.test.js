@@ -1,6 +1,6 @@
 'use strict'
 
-const { buildWorld, getCell, getCellNeighbours, computeCellNextState, countPopulatedCells, getNextState, CELL_STATE, getNextGeneration } = require('./index')
+const { buildWorld, getCell, getCellNeighbours, computeCellNextState, countPopulatedCells, getNextState, CELL_STATE, getNextGeneration, getNextGenerationWithoutRecursion } = require('./index')
 
 describe("Game of Life", () => {
   const populatedCells = [
@@ -89,8 +89,28 @@ describe("Game of Life", () => {
     expect(computeCellNextState(world, cell)).toStrictEqual(nextState)
   })
 
-  it("compute next generation of the world", () => {
+  it("should compute the next generation of the world (with recursion)", () => {
     const nextWorld = getNextGeneration(world)
+    expect(nextWorld.size).toEqual(5)
+
+    expect(getCell(nextWorld, {x: 1, y: -1})).toBeFalsy()
+    expect(getCell(nextWorld, {x: 1, y: 1})).toBeFalsy()
+    expect(getCell(nextWorld, {x: 1, y: 2})).toBeTruthy()
+    expect(getCell(nextWorld, {x: 1, y: 3})).toBeFalsy()
+
+    expect(getCell(nextWorld, {x: 2, y: -1})).toBeTruthy()
+    expect(getCell(nextWorld, {x: 2, y: 1})).toBeTruthy()
+    expect(getCell(nextWorld, {x: 2, y: 2})).toBeFalsy()
+    expect(getCell(nextWorld, {x: 2, y: 3})).toBeFalsy()
+
+    expect(getCell(nextWorld, {x: 3, y: -1})).toBeFalsy()
+    expect(getCell(nextWorld, {x: 3, y: 1})).toBeTruthy()
+    expect(getCell(nextWorld, {x: 3, y: 2})).toBeTruthy()
+    expect(getCell(nextWorld, {x: 3, y: 3})).toBeFalsy()
+  })
+
+  it("should compute the next generation of the world (without recursion)", () => {
+    const nextWorld = getNextGenerationWithoutRecursion(world)
     expect(nextWorld.size).toEqual(5)
 
     expect(getCell(nextWorld, {x: 1, y: -1})).toBeFalsy()

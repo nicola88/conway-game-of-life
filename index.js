@@ -164,6 +164,31 @@ const getNextGeneration = (world) => {
   return nextWorld
 }
 
+/**
+ * @param {World} world 
+ */
+const getNextGenerationWithoutRecursion = (world) => {
+  const nextWorld = new Map()
+  const visitedCells = new Set()
+  const cellsToVisit = Array.from(world.keys())
+  while (cellsToVisit.length > 0) {
+    const cellId = cellsToVisit.pop()
+    const cell = parseCellId(cellId)
+    if (!visitedCells.has(cellId)) {
+      const neighbours = getCellNeighbours(cell)
+      const numPopulatedNeighbours = countPopulatedCells(world, neighbours)
+      const isPopulated = getCell(world, cell)
+      if (isPopulated || numPopulatedNeighbours > 0) {
+        const willBePopulated = getNextState(isPopulated, numPopulatedNeighbours)
+        if (willBePopulated) { setCell(nextWorld, cell, true) }
+        visitedCells.add(cellId)
+        neighbours.forEach(neighbour => cellsToVisit.push(getCellId(neighbour)))
+      }
+    }
+  }
+  return nextWorld
+}
+
 module.exports = {
   CELL_STATE,
   buildWorld,
@@ -173,4 +198,5 @@ module.exports = {
   getCellNeighbours,
   getNextState,
   getNextGeneration,
+  getNextGenerationWithoutRecursion,
 }
