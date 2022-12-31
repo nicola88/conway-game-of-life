@@ -1,6 +1,6 @@
 'use strict'
 
-const { buildWorld, getCell, getCellNeighbours, computeCellNextState, countPopulatedCells, getNextState, CELL_STATE, getNextGeneration, getNextGenerationWithoutRecursion, getMinimumGridSize, printWorld } = require('./index')
+const { buildWorld, getCell, getCellNeighbours, computeCellNextState, countPopulatedCells, getNextState, CELL_STATE, getNextGeneration, getNextGenerationWithoutRecursion, getMinimumGridSize, printWorld, readWorldFromFile } = require('./index')
 
 describe("Game of Life", () => {
   const populatedCells = [
@@ -149,5 +149,19 @@ describe("Game of Life", () => {
     nextWorld = getNextGenerationWithoutRecursion(nextWorld)
     nextWorldStr = printWorld(nextWorld)
     expect(nextWorldStr).toEqual(' | |X\nX| |X\n |X|X')
+  })
+
+  it('should import the world from a file', () => {
+    const world = readWorldFromFile('test_world.csv')
+    expect(world.size).toEqual(5)
+
+    expect(getCell(world, {x: -1, y: 3})).toBeTruthy()
+    expect(getCell(world, {x: -2, y: 5})).toBeTruthy()
+    expect(getCell(world, {x: 3, y: 5})).toBeTruthy()
+    expect(getCell(world, {x: 4, y: 3})).toBeTruthy()
+    expect(getCell(world, {x: 5, y: 2})).toBeTruthy()
+
+    expect(getCell(world, {x: -1, y: 2})).toBeFalsy()
+    expect(getCell(world, {x: 3, y: 3})).toBeFalsy()
   })
 })

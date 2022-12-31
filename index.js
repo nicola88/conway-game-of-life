@@ -1,5 +1,7 @@
 'use strict'
 
+const fs = require('fs')
+
 /**
  * A cell
  * @typedef  {Object} Cell
@@ -233,6 +235,27 @@ const printWorld = (world, columnSeparator = '|', rowSeparator = '\n', populated
   return worldStr.join(rowSeparator)
 }
 
+/**
+ * Read the world initial state from a file
+ * 
+ * The file is expected to contain the list of the populated cells, one for each line.
+ * Each line should contain the X coordinate followed by the Y coordinate,
+ * separated by a delimiter character.
+ * @param {string} path File patch
+ * @param {string} encoding File encoding (default: UTF-8)
+ * @param {string} delimiter Fields delimiter (default: comma)
+ * @returns {World} The world containing the given populated cells
+ */
+const readWorldFromFile = (path, encoding = 'UTF-8', delimiter = ',') => {
+  const worldData = fs.readFileSync(path, encoding)
+  const lines = worldData.split(/\r?\n/)
+  const populatedCells = lines.map(line => {
+    const [x, y] = line.split(delimiter).map(coordinate => parseInt(coordinate))
+    return {x, y}
+  })
+  return buildWorld(populatedCells)
+}
+
 module.exports = {
   CELL_STATE,
   buildWorld,
@@ -245,4 +268,5 @@ module.exports = {
   getNextGeneration,
   getNextGenerationWithoutRecursion,
   printWorld,
+  readWorldFromFile,
 }
