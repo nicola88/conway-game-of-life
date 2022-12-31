@@ -189,6 +189,48 @@ const getNextGenerationWithoutRecursion = (world) => {
   return nextWorld
 }
 
+/**
+ * Return the smallest grid containing all the populated cells of the world
+ * @param {World} world
+ * @returns {{x: {max: number, min: number}, y: {max: number, min: number}}}
+ */
+const getMinimumGridSize = (world) => {
+  const cells = Array.from(world.keys()).map(parseCellId)
+  const minX = Math.min(...cells.map(cell => cell.x))
+  const maxX = Math.max(...cells.map(cell => cell.x))
+  const minY = Math.min(...cells.map(cell => cell.y))
+  const maxY = Math.max(...cells.map(cell => cell.y))
+  return {
+    x: { min: minX, max: maxX},
+    y: { min: minY, max: maxY},
+  }
+}
+
+/**
+ * Return a string representing the smalles world grid containing all the populated cells
+ * @param {World} world World to print to a string 
+ * @param {string} columnSeparator String to use as separator between cells on the same grid row (default: '|')
+ * @param {string} rowSeparator String to use as separator between different rows (default: '\n')
+ * @param {string} populatedChar Single character to print inside a populated cell 
+ * @param {string} notPopulatedChar Single character to print inside a cell not populated 
+ * @returns {string} A string representing the smalles world grid containing all the populated cells 
+ */
+const printWorld = (world, columnSeparator = '|', rowSeparator = '\n', populatedChar = 'X', notPopulatedChar = ' ') => {
+  const worldStr = []
+  const gridSize = getMinimumGridSize(world)
+  for (let row = gridSize.y.max; row >= gridSize.y.min; row--) {
+    if (row != 0) {
+      const rowCells = []
+      for (let column = gridSize.x.min; column <= gridSize.x.max; column++) {
+        const isPopulated = getCell(world, {x: column, y: row})
+        rowCells.push(isPopulated ? populatedChar : notPopulatedChar)
+      }
+      worldStr.push(rowCells.join(columnSeparator))
+    }
+  }
+  return worldStr.join(rowSeparator)
+}
+
 module.exports = {
   CELL_STATE,
   buildWorld,
@@ -196,7 +238,9 @@ module.exports = {
   countPopulatedCells,
   getCell,
   getCellNeighbours,
+  getMinimumGridSize,
   getNextState,
   getNextGeneration,
   getNextGenerationWithoutRecursion,
+  printWorld,
 }

@@ -1,6 +1,6 @@
 'use strict'
 
-const { buildWorld, getCell, getCellNeighbours, computeCellNextState, countPopulatedCells, getNextState, CELL_STATE, getNextGeneration, getNextGenerationWithoutRecursion } = require('./index')
+const { buildWorld, getCell, getCellNeighbours, computeCellNextState, countPopulatedCells, getNextState, CELL_STATE, getNextGeneration, getNextGenerationWithoutRecursion, getMinimumGridSize, printWorld } = require('./index')
 
 describe("Game of Life", () => {
   const populatedCells = [
@@ -127,5 +127,27 @@ describe("Game of Life", () => {
     expect(getCell(nextWorld, {x: 3, y: 1})).toBeTruthy()
     expect(getCell(nextWorld, {x: 3, y: 2})).toBeTruthy()
     expect(getCell(nextWorld, {x: 3, y: 3})).toBeFalsy()
+  })
+
+  it('should compute the minimum grid size containing all populated cells', () => {
+    const gridSize = getMinimumGridSize(world)
+    expect(gridSize).toEqual({
+      x: { min: 1, max: 3 },
+      y: { min: 1, max: 3 },
+    })
+  })
+
+  it('should print the world to a string', () => {
+    // Generation zero
+    const worldStr = printWorld(world)
+    expect(worldStr).toEqual(' |X| \n | |X\nX|X|X')
+    // First generation
+    let nextWorld = getNextGenerationWithoutRecursion(world)
+    let nextWorldStr = printWorld(nextWorld)
+    expect(nextWorldStr).toEqual('X| |X\n |X|X\n |X| ')
+    // Second generation
+    nextWorld = getNextGenerationWithoutRecursion(nextWorld)
+    nextWorldStr = printWorld(nextWorld)
+    expect(nextWorldStr).toEqual(' | |X\nX| |X\n |X|X')
   })
 })
