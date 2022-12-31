@@ -211,9 +211,9 @@ const getMinimumGridSize = (world) => {
  * @param {World} world World to print to a string 
  * @param {string} columnSeparator String to use as separator between cells on the same grid row (default: '|')
  * @param {string} rowSeparator String to use as separator between different rows (default: '\n')
- * @param {string} populatedChar Single character to print inside a populated cell 
- * @param {string} notPopulatedChar Single character to print inside a cell not populated 
- * @returns {string} A string representing the smalles world grid containing all the populated cells 
+ * @param {string} populatedChar Single character to print inside a populated cell (default: 'X')
+ * @param {string} notPopulatedChar Single character to print inside a cell not populated (default: ' ')
+ * @returns {string} A string representing the smallest world grid containing all the populated cells
  */
 const printWorld = (world, columnSeparator = '|', rowSeparator = '\n', populatedChar = 'X', notPopulatedChar = ' ') => {
   const worldStr = []
