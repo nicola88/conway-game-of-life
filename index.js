@@ -222,8 +222,10 @@ const printWorld = (world, columnSeparator = '|', rowSeparator = '\n', populated
     if (row != 0) {
       const rowCells = []
       for (let column = gridSize.x.min; column <= gridSize.x.max; column++) {
-        const isPopulated = getCell(world, {x: column, y: row})
-        rowCells.push(isPopulated ? populatedChar : notPopulatedChar)
+        if (column != 0) {
+          const isPopulated = getCell(world, {x: column, y: row})
+          rowCells.push(isPopulated ? populatedChar : notPopulatedChar)
+        }
       }
       worldStr.push(rowCells.join(columnSeparator))
     }
