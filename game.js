@@ -66,7 +66,7 @@ const setupWorld = async() => {
   const populationSize = await askPopulationSize()
 
   const world = generateWorld(gridSize, populationSize)
-  console.log(`Generated random ${gridSize}x${gridSize} world with ${populationSize}% of populated cells...`)
+  console.log(`Generated random ${gridSize}x${gridSize} world with ${populationSize}% of populated cells!`)
   console.log(printWorld(world))
   return world
 }
@@ -77,7 +77,6 @@ const runGame = async(world) => {
   while ((await new Confirm({
     name: 'question',
     message: 'Continue to next generation?',
-    initial: undefined,
   }).run())) {
     const nextGeneration = getNextGenerationWithoutRecursion(currentGeneration)
     console.log(printWorld(nextGeneration))
