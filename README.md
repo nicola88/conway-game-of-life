@@ -6,6 +6,13 @@ JavaScript implementation of Conway's Game of Life.
 
 ```bash
 nvm use
-# Run the tests
+# Run tests
 npm test
+# Run interactive game
+npm run game
 ```
+
+## Improvements
+
+- [ ] Add support for zero-based coordinates
+- [ ] Use `Set` instead of `Map` to store populated cells

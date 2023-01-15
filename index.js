@@ -262,6 +262,7 @@ module.exports = {
   computeCellNextState,
   countPopulatedCells,
   getCell,
+  getCellId,
   getCellNeighbours,
   getMinimumGridSize,
   getNextState,

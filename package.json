@@ -2,9 +2,13 @@
   "name": "game-of-life",
   "version": "1.0.0",
   "description": "Conway's Game of Life",
-  "keywords": ["kata", "game of life"],
+  "keywords": [
+    "kata",
+    "game of life"
+  ],
   "main": "index.js",
   "scripts": {
+    "game": "node game.js",
     "test": "jest"
   },
   "contributors": [
@@ -14,5 +18,8 @@
   "license": "ISC",
   "devDependencies": {
     "jest": "^29.1.2"
+  },
+  "dependencies": {
+    "enquirer": "^2.3.6"
   }
 }
