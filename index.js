@@ -1,5 +1,6 @@
 'use strict'
 
+const assert = require('assert')
 const fs = require('fs')
 
 /**
@@ -22,6 +23,17 @@ const fs = require('fs')
 var CELL_STATE = {
   POPULATED: true,
   NOT_POPULATED: false,
+}
+
+/**
+ * Text alignment
+ * @readonly
+ * @enum {string}
+ */
+var TEXT_ALIGN = {
+  LEFT: 'left',
+  CENTER: 'center',
+  RIGHT: 'right',
 }
 
 /**
@@ -209,6 +221,23 @@ const getMinimumGridSize = (world) => {
 }
 
 /**
+ * Create a new string of fixed length with some text center aligned 
+ * @param {string} textToAlign 
+ * @param {number} stringLength 
+ * @returns {string} A new string with given length and the given text center aligned
+ */
+const alignCenter = (textToAlign, stringLength) => {
+  assert(textToAlign.length <= stringLength)
+  const requiredPadding = stringLength - textToAlign.length
+  let paddedString = textToAlign
+  if (requiredPadding > 0) {
+    const padStart = requiredPadding / 2
+    paddedString = textToAlign.padStart(padStart + textToAlign.length).padEnd(stringLength)
+  }
+  return paddedString
+}
+
+/**
  * Return a string representing the smalles world grid containing all the populated cells
  * @param {World} world World to print to a string 
  * @param {string} columnSeparator String to use as separator between cells on the same grid row (default: '|')
@@ -220,18 +249,26 @@ const getMinimumGridSize = (world) => {
 const printWorld = (world, columnSeparator = '|', rowSeparator = '\n', populatedChar = 'X', notPopulatedChar = ' ') => {
   const worldStr = []
   const gridSize = getMinimumGridSize(world)
+  const colNumPadding = Math.max(gridSize.x.min.toString().length, gridSize.x.max.toString().length)
+  const rowNumPadding = Math.max(gridSize.y.min.toString().length, gridSize.y.max.toString().length)
+  let colsNumbers = []
+  for (let column = gridSize.x.min; column <= gridSize.x.max; column++) { colsNumbers.push(column.toString().padEnd(colNumPadding))  }
+  const colsLabels = `${" ".repeat(rowNumPadding + 1)}${colsNumbers.join(" ")}`
+  worldStr.push(colsLabels)
   for (let row = gridSize.y.max; row >= gridSize.y.min; row--) {
     if (row != 0) {
+      const rowLabel = row.toString().padStart(rowNumPadding, " ")
       const rowCells = []
       for (let column = gridSize.x.min; column <= gridSize.x.max; column++) {
         if (column != 0) {
           const isPopulated = getCell(world, {x: column, y: row})
-          rowCells.push(isPopulated ? populatedChar : notPopulatedChar)
+          rowCells.push(alignCenter(isPopulated ? populatedChar : notPopulatedChar, colNumPadding))
         }
       }
-      worldStr.push(rowCells.join(columnSeparator))
+      worldStr.push(rowLabel + " " + rowCells.join(columnSeparator))
     }
   }
+  worldStr.push(colsLabels)
   return worldStr.join(rowSeparator)
 }
 
@@ -258,6 +295,7 @@ const readWorldFromFile = (path, encoding = 'UTF-8', delimiter = ',') => {
 
 module.exports = {
   CELL_STATE,
+  alignCenter,
   buildWorld,
   computeCellNextState,
   countPopulatedCells,

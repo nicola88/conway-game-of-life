@@ -1,6 +1,6 @@
 'use strict'
 
-const { buildWorld, getCell, getCellNeighbours, computeCellNextState, countPopulatedCells, getNextState, CELL_STATE, getNextGeneration, getNextGenerationWithoutRecursion, getMinimumGridSize, printWorld, readWorldFromFile } = require('./index')
+const { buildWorld, getCell, getCellNeighbours, computeCellNextState, countPopulatedCells, getNextState, CELL_STATE, getNextGeneration, getNextGenerationWithoutRecursion, getMinimumGridSize, printWorld, readWorldFromFile, alignCenter } = require('./index')
 
 describe("Game of Life", () => {
   const populatedCells = [
@@ -140,15 +140,15 @@ describe("Game of Life", () => {
   it('should print the world to a string', () => {
     // Generation zero
     const worldStr = printWorld(world)
-    expect(worldStr).toEqual(' |X| \n | |X\nX|X|X')
+    expect(worldStr).toEqual('  1 2 3\n3  |X| \n2  | |X\n1 X|X|X\n  1 2 3')
     // First generation
     let nextWorld = getNextGenerationWithoutRecursion(world)
     let nextWorldStr = printWorld(nextWorld)
-    expect(nextWorldStr).toEqual('X| |X\n |X|X\n |X| ')
+    expect(nextWorldStr).toEqual('   1 2 3\n 2 X| |X\n 1  |X|X\n-1  |X| \n   1 2 3')
     // Second generation
     nextWorld = getNextGenerationWithoutRecursion(nextWorld)
     nextWorldStr = printWorld(nextWorld)
-    expect(nextWorldStr).toEqual(' | |X\nX| |X\n |X|X')
+    expect(nextWorldStr).toEqual('   1 2 3\n 2  | |X\n 1 X| |X\n-1  |X|X\n   1 2 3')
   })
 
   it('should import the world from a file', () => {
@@ -163,5 +163,10 @@ describe("Game of Life", () => {
 
     expect(getCell(world, {x: -1, y: 2})).toBeFalsy()
     expect(getCell(world, {x: 3, y: 3})).toBeFalsy()
+  })
+
+  it('should align text at the center in a string', () => {
+    expect(alignCenter("X", "3")).toStrictEqual(" X ")
+    expect(alignCenter("X", "4")).toStrictEqual(" X  ")
   })
 })
